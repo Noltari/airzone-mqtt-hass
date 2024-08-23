@@ -1,0 +1,133 @@
+name: CI
+
+on:
+  - push
+  - pull_request
+
+env:
+  DEFAULT_PYTHON: "3.12"
+
+jobs:
+  black:
+    name: Check Black
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.DEFAULT_PYTHON }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON }}
+
+      - name: Upgrade pip
+        run: |
+          python -m pip install --upgrade pip
+          pip --version
+
+      - name: Install Black
+        run: |
+          pip install black
+
+      - name: Run Black
+        run: |
+          black --check --diff airzone_mqtt_hass
+
+  pylint:
+    name: Check Pylint (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12", "3.13"]
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Upgrade pip
+        run: |
+          python -m pip install --upgrade pip
+          pip --version
+
+      - name: Install Requirements
+        run: |
+          pip install -r requirements.txt
+          pip install -r requirements_dev.txt
+
+      - name: Install Pylint
+        run: |
+          pip install pylint
+
+      - name: Run Pylint
+        run: |
+          pylint airzone_mqtt_hass
+
+      - name: Install airzone_mqtt_hass
+        run: |
+          pip install --upgrade .
+
+  mypy:
+    name: Check Mypy (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12", "3.13"]
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Upgrade pip
+        run: |
+          python -m pip install --upgrade pip
+          pip --version
+
+      - name: Install Requirements
+        run: |
+          pip install -r requirements.txt
+          pip install -r requirements_dev.txt
+
+      - name: Install Mypy
+        run: |
+          pip install mypy
+
+      - name: Run Mypy
+        run: |
+          mypy --strict airzone_mqtt_hass
+
+      - name: Install airzone_mqtt_hass
+        run: |
+          pip install --upgrade .
+
+  ruff:
+    name: Check ruff
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.DEFAULT_PYTHON }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON }}
+
+      - name: Upgrade pip
+        run: |
+          python -m pip install --upgrade pip
+          pip --version
+
+      - name: Install ruff
+        run: |
+          pip install ruff
+
+      - name: Run ruff
+        run: |
+          ruff check airzone_mqtt_hass
